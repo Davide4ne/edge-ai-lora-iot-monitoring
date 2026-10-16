@@ -89,8 +89,9 @@ Each scenario includes:
 
 # Authors
 
-- **Gabriele Postorino**
 - **Davide Maria Quattrone**
+- **Gabriele Postorino**
+
 
 Master's Degree in Computer Engineering and Telecommunications
 
