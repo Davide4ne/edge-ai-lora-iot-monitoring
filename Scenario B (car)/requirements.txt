@@ -1,0 +1,12 @@
+ai-edge-litert==2.1.5
+backports.strenum==1.2.8
+flatbuffers==20181003210633
+numpy==2.4.6
+pillow==12.2.0
+protobuf==7.35.0
+pyserial==3.5
+tqdm==4.68.2
+typing_extensions==4.15.0
+opencv-python
+python-dotenv
+python-telegram-bot

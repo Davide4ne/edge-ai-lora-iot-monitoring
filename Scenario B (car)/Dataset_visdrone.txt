@@ -1,0 +1,14 @@
+@misc{ visdrone-vehicles_dataset,
+  title = { Visdrone vehicles Dataset },
+  type = { Open Source Dataset },
+  author = { dataset },
+  howpublished = { \url{ https://universe.roboflow.com/dataset-wa0xh/visdrone-vehicles } },
+  url = { https://universe.roboflow.com/dataset-wa0xh/visdrone-vehicles },
+  journal = { Roboflow Universe },
+  publisher = { Roboflow },
+  year = { 2026 },
+  month = { feb },
+  note = { visited on 2026-07-04 },
+}
+
+Download the version 2024-11-30, format YOLOv8

@@ -1,0 +1,451 @@
+[
+    {
+        "id": "3aad79e80ba9f80a",
+        "type": "tab",
+        "label": "Flow Egg",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "7902740e0694be7c",
+        "type": "serial in",
+        "z": "3aad79e80ba9f80a",
+        "name": "LoRa_RX",
+        "serial": "14ad53bb9ad42dc9",
+        "x": 140,
+        "y": 500,
+        "wires": [
+            [
+                "9aeb9ebf9ee301f1"
+            ]
+        ]
+    },
+    {
+        "id": "9aeb9ebf9ee301f1",
+        "type": "json",
+        "z": "3aad79e80ba9f80a",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 500,
+        "wires": [
+            [
+                "07f756a769356de0"
+            ]
+        ]
+    },
+    {
+        "id": "221a5820d2e18a5b",
+        "type": "function",
+        "z": "3aad79e80ba9f80a",
+        "name": "function principale",
+        "func": "let timestamp = new Date().toLocaleString();\nlet stato = msg.payload.egg ? \"🥚 UOVA PRESENTI\" : \"❌ NESSUN UOVO\";\nlet probabilita = Number((msg.payload.prob * 100).toFixed(1));\n\nreturn [\n    { payload: stato },\n    { payload: probabilita },\n    { payload: timestamp },\n    { payload: `${timestamp},${msg.payload.egg},${msg.payload.label},${probabilita}` }\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 160,
+        "wires": [
+            [
+                "0eeddb430c5aea01"
+            ],
+            [
+                "b19f9b8bf860399c"
+            ],
+            [
+                "b43cd67c87a42882"
+            ],
+            [
+                "0b8863bdc79a345d"
+            ]
+        ]
+    },
+    {
+        "id": "0eeddb430c5aea01",
+        "type": "ui_text",
+        "z": "3aad79e80ba9f80a",
+        "group": "ae752721635607d6",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Stato uova",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 730,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "b43cd67c87a42882",
+        "type": "ui_text",
+        "z": "3aad79e80ba9f80a",
+        "group": "ae752721635607d6",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Ultimo aggiornamento",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 760,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "b19f9b8bf860399c",
+        "type": "ui_gauge",
+        "z": "3aad79e80ba9f80a",
+        "name": "",
+        "group": "ae752721635607d6",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Probabilità",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#b30009",
+            "#e6e600",
+            "#3acb4a"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 730,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "337b9f58b4b099fb",
+        "type": "switch",
+        "z": "3aad79e80ba9f80a",
+        "name": "",
+        "property": "payload.egg",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 310,
+        "y": 380,
+        "wires": [
+            [
+                "7df36d3f01486733"
+            ],
+            [
+                "f4f8b8903e59fbe5"
+            ]
+        ]
+    },
+    {
+        "id": "7df36d3f01486733",
+        "type": "function",
+        "z": "3aad79e80ba9f80a",
+        "name": "function alert positivo",
+        "func": "let p = msg.payload;\n\nmsg.payload = {\n    chatId: env.get(\"TELEGRAM_CHAT_ID\"),\n    type: \"message\",\n    content:\n        `🥚 UOVA RILEVATE\n\nStato: ${p.label}\nProbabilità: ${(p.prob * 100).toFixed(2)}%\n\nOra: ${new Date().toLocaleString(\"it-IT\")}`\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 340,
+        "wires": [
+            [
+                "8a1c2c6f3588dc8b"
+            ]
+        ]
+    },
+    {
+        "id": "07f756a769356de0",
+        "type": "mqtt out",
+        "z": "3aad79e80ba9f80a",
+        "name": "mqtt out",
+        "topic": "iot/uova/classificazione",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "4d4c78f75aee4de7",
+        "x": 560,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "25672bc8ec46951c",
+        "type": "mqtt in",
+        "z": "3aad79e80ba9f80a",
+        "name": "mqtt in",
+        "topic": "iot/uova/classificazione",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "4d4c78f75aee4de7",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "221a5820d2e18a5b",
+                "337b9f58b4b099fb"
+            ]
+        ]
+    },
+    {
+        "id": "8a1c2c6f3588dc8b",
+        "type": "telegram sender",
+        "z": "3aad79e80ba9f80a",
+        "name": "",
+        "bot": "8c2c8ed03ae93adc",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 850,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4f611a8d57404cba",
+        "type": "sqlite",
+        "z": "3aad79e80ba9f80a",
+        "mydb": "8206c9901a6b3f37",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "DB Uova",
+        "x": 860,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0b8863bdc79a345d",
+        "type": "function",
+        "z": "3aad79e80ba9f80a",
+        "name": "function sql",
+        "func": "let s = msg.payload;\n\n// Se arriva già come stringa CSV:\n// \"16/06/2026, 10:08:36,1,Egg,97.3\"\nlet parts = s.split(\",\");\n\nif (parts.length < 5) {\n    node.warn(\"Formato non valido: \" + s);\n    return null;\n}\n\nlet timestamp = parts[0].trim() + \", \" + parts[1].trim();\nlet egg = Number(parts[2].trim());\nlet label = parts[3].trim();\nlet prob = Number(parts[4].trim());\n\nmsg.topic = `\nINSERT INTO rilevazioni (timestamp, egg, label, prob)\nVALUES ('${timestamp}', ${egg}, '${label}', ${prob})\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 240,
+        "wires": [
+            [
+                "4f611a8d57404cba"
+            ]
+        ]
+    },
+    {
+        "id": "f4f8b8903e59fbe5",
+        "type": "function",
+        "z": "3aad79e80ba9f80a",
+        "name": "function alert negativo",
+        "func": "let p = msg.payload;\n\nmsg.payload = {\n    chatId: env.get(\"TELEGRAM_CHAT_ID\"),\n    type: \"message\",\n    content:\n        `❌ NESSUN UOVO RILEVATO\n\nStato: ${p.label}\nProbabilità: ${(p.prob * 100).toFixed(2)}%\n\nOra: ${new Date().toLocaleString(\"it-IT\")}`\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 420,
+        "wires": [
+            [
+                "8a1c2c6f3588dc8b"
+            ]
+        ]
+    },
+    {
+        "id": "5b493afce581e983",
+        "type": "telegram receiver",
+        "z": "3aad79e80ba9f80a",
+        "name": "",
+        "bot": "8c2c8ed03ae93adc",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "hasinput": false,
+        "inputs": 0,
+        "handleallupdates": true,
+        "handleprocessupdates": true,
+        "x": 250,
+        "y": 620,
+        "wires": [
+            [
+                "99dc06d5cb11c155"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "99dc06d5cb11c155",
+        "type": "debug",
+        "z": "3aad79e80ba9f80a",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "14ad53bb9ad42dc9",
+        "type": "serial-port",
+        "name": "RX Port",
+        "serialport": "COM4",
+        "serialbaud": "115200",
+        "databits": 8,
+        "parity": "none",
+        "stopbits": 1,
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": 10000
+    },
+    {
+        "id": "ae752721635607d6",
+        "type": "ui_group",
+        "name": "Egg Monitor",
+        "tab": "a9fb76956b6e3f89",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4d4c78f75aee4de7",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "8c2c8ed03ae93adc",
+        "type": "telegram bot",
+        "botname": "Egg Monitor",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": 300,
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": 6667,
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": 8443,
+        "publicbotport": 8443,
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "8206c9901a6b3f37",
+        "type": "sqlitedb",
+        "db": "uova.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "a9fb76956b6e3f89",
+        "type": "ui_tab",
+        "name": "Dashboard Uova",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "c48db004b14bb6d7",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-serialport": "2.0.3",
+            "node-red-dashboard": "3.6.6",
+            "node-red-contrib-telegrambot": "17.4.13",
+            "node-red-node-sqlite": "2.0.1"
+        }
+    }
+]

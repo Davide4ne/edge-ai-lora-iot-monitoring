@@ -1,0 +1,59 @@
+# ========================================
+# Python
+# ========================================
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# ========================================
+# Secrets and credentials
+# ========================================
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+credentials.json
+flows_cred.json
+*_cred.json
+
+# ========================================
+# SQLite databases
+# ========================================
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# ========================================
+# Generated files
+# ========================================
+images/
+*_detected.jpg
+*_detected.jpeg
+cron_log.txt
+*.log
+
+# ========================================
+# IDE and operating system
+# ========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ========================================
+# Temporary files
+# ========================================
+*.tmp
+*.bak
+*~

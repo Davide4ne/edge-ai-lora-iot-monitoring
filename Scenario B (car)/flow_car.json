@@ -1,0 +1,354 @@
+[
+    {
+        "id": "7815250e5d93187d",
+        "type": "tab",
+        "label": "Flow Car",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "dead949db7066042",
+        "type": "serial in",
+        "z": "7815250e5d93187d",
+        "name": "LoRa_RX",
+        "serial": "14ad53bb9ad42dc9",
+        "x": 180,
+        "y": 520,
+        "wires": [
+            [
+                "2fe23f38bed1733e"
+            ]
+        ]
+    },
+    {
+        "id": "2fe23f38bed1733e",
+        "type": "json",
+        "z": "7815250e5d93187d",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 370,
+        "y": 520,
+        "wires": [
+            [
+                "7c6ce7029ab7738e"
+            ]
+        ]
+    },
+    {
+        "id": "d635e340583dc6e5",
+        "type": "function",
+        "z": "7815250e5d93187d",
+        "name": "function principale",
+        "func": "let timestamp = new Date().toLocaleString();\n\nlet cars = Number(msg.payload.cars);\nlet postiTotali = 20;\n\nif (cars < 0) cars = 0;\nif (cars > postiTotali) cars = postiTotali;\n\nlet postiLiberi = postiTotali - cars;\n\nlet stato = cars >= postiTotali\n    ? \"🟥 PARCHEGGIO PIENO\"\n    : \"🟩 POSTI DISPONIBILI\";\n\nlet grid = {\n    cars: cars,\n    free: postiLiberi,\n    total: postiTotali\n};\n\nreturn [\n    { payload: stato },\n    { payload: grid },\n    { payload: timestamp },\n    {\n        payload: {\n            timestamp: timestamp,\n            cars: cars,\n            free: postiLiberi,\n            stato: stato\n        }\n    }\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 180,
+        "wires": [
+            [
+                "ea1479c5422ea0c9"
+            ],
+            [
+                "17f9464837d5de9a"
+            ],
+            [
+                "3c5dcaab5fbaa28d"
+            ],
+            [
+                "e3f92cbc9bec65bd"
+            ]
+        ]
+    },
+    {
+        "id": "ea1479c5422ea0c9",
+        "type": "ui_text",
+        "z": "7815250e5d93187d",
+        "group": "ec1f1bfd45d5268b",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Stato parcheggio",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 770,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "3c5dcaab5fbaa28d",
+        "type": "ui_text",
+        "z": "7815250e5d93187d",
+        "group": "ec1f1bfd45d5268b",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Ultimo aggiornamento",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 780,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "8668d976c68b1a3c",
+        "type": "function",
+        "z": "7815250e5d93187d",
+        "name": "function alert parcheggio",
+        "func": "let cars = Number(msg.payload.cars);\nlet postiTotali = 20;\nlet postiLiberi = postiTotali - cars;\n\nif (postiLiberi < 0) postiLiberi = 0;\n\nlet timestamp = new Date().toLocaleString();\n\nmsg.payload = {\n    chatId: env.get(\"TELEGRAM_CHAT_ID\"),\n    type: \"message\",\n    content:\n        `🚗 Rilevazione parcheggio\n\nAuto rilevate: ${cars}/${postiTotali}\nPosti liberi stimati: ${postiLiberi}\nOra: ${timestamp}`\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 360,
+        "wires": [
+            [
+                "f1c268356663145a"
+            ]
+        ]
+    },
+    {
+        "id": "7c6ce7029ab7738e",
+        "type": "mqtt out",
+        "z": "7815250e5d93187d",
+        "name": "mqtt out",
+        "topic": "iot/car/conteggio",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "4d4c78f75aee4de7",
+        "x": 580,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "6f34ba2a78208b94",
+        "type": "mqtt in",
+        "z": "7815250e5d93187d",
+        "name": "mqtt in",
+        "topic": "iot/car/conteggio",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "4d4c78f75aee4de7",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 200,
+        "wires": [
+            [
+                "d635e340583dc6e5",
+                "8668d976c68b1a3c"
+            ]
+        ]
+    },
+    {
+        "id": "f1c268356663145a",
+        "type": "telegram sender",
+        "z": "7815250e5d93187d",
+        "name": "",
+        "bot": "990d153447ba39ff",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 830,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "17f9464837d5de9a",
+        "type": "ui_template",
+        "z": "7815250e5d93187d",
+        "group": "ec1f1bfd45d5268b",
+        "name": "Park Grid",
+        "order": 0,
+        "width": "6",
+        "height": "12",
+        "format": "<div style=\"font-family: Arial; text-align:center;\">\n    <h3>Parcheggio</h3>\n\n    <div style=\"\n        display: grid;\n        grid-template-columns: repeat(5, 1fr);\n        gap: 8px;\n        justify-content: center;\n        margin-bottom: 10px;\n    \">\n        <div ng-repeat=\"i in [].constructor(msg.payload.total) track by $index\" style=\"\n                width: 100%;\n                height: 45px;\n                border-radius: 8px;\n                display: flex;\n                align-items: center;\n                justify-content: center;\n                color: white;\n                font-weight: bold;\n             \" ng-style=\"{\n                'background-color': $index < msg.payload.cars ? '#c62828' : '#2e7d32'\n             }\">\n            {{$index + 1}}\n        </div>\n    </div>\n\n    <div>\n        🚗 Occupati: <b>{{msg.payload.cars}}</b> /\n        🅿️ Liberi: <b>{{msg.payload.free}}</b>\n    </div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 740,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e3f92cbc9bec65bd",
+        "type": "function",
+        "z": "7815250e5d93187d",
+        "name": "function sql",
+        "func": "let d = msg.payload;\n\nlet timestamp = d.timestamp;\nlet autoRilevate = Number(d.cars);\nlet postiLiberi = Number(d.free);\nlet stato = d.stato;\n\nif (isNaN(autoRilevate) || isNaN(postiLiberi)) {\n    node.warn(\"Valori non validi: \" + JSON.stringify(d));\n    return null;\n}\n\nmsg.topic = `\nINSERT INTO parcheggio (\n    timestamp,\n    auto_rilevate,\n    posti_liberi,\n    stato\n)\nVALUES (\n    '${timestamp}',\n    ${autoRilevate},\n    ${postiLiberi},\n    '${stato}'\n)\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 280,
+        "wires": [
+            [
+                "878876c15d16e7ab"
+            ]
+        ]
+    },
+    {
+        "id": "878876c15d16e7ab",
+        "type": "sqlite",
+        "z": "7815250e5d93187d",
+        "mydb": "100201c5768b6e19",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "DB Cars",
+        "x": 840,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "14ad53bb9ad42dc9",
+        "type": "serial-port",
+        "name": "RX Port",
+        "serialport": "COM4",
+        "serialbaud": "115200",
+        "databits": 8,
+        "parity": "none",
+        "stopbits": 1,
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": 10000
+    },
+    {
+        "id": "ec1f1bfd45d5268b",
+        "type": "ui_group",
+        "name": "Car monitor",
+        "tab": "a8ad46d74c1785d2",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4d4c78f75aee4de7",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "990d153447ba39ff",
+        "type": "telegram bot",
+        "botname": "Car Alert Output",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": 300,
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": 6667,
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": 8443,
+        "publicbotport": 8443,
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "100201c5768b6e19",
+        "type": "sqlitedb",
+        "db": "cars.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "a8ad46d74c1785d2",
+        "type": "ui_tab",
+        "name": "Dashboard Cars",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "f53db42f822d5c89",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-serialport": "2.0.3",
+            "node-red-dashboard": "3.6.6",
+            "node-red-contrib-telegrambot": "17.4.13",
+            "node-red-node-sqlite": "2.0.1"
+        }
+    }
+]
